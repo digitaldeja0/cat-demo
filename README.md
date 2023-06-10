@@ -1,3 +1,5 @@
+![Banner Image](https://raw.githubusercontent.com/digitaldeja0/cat-demo/main/public/assets/cat-demo-social.png)
+
 # Cat Game
 
 ## Overview
