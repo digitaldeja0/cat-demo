@@ -1,10 +1,10 @@
 import "./style.css";
 import * as PIXI from "pixi.js";
+import * as particles from "@pixi/particle-emitter";
 import { sound } from "@pixi/sound";
-// import { GlowFilter } from 'pixi-filters';
 import { GlowFilter } from "@pixi/filter-glow";
-// import * as particles from '@pixi/particle-emitter'
-// import ParticleSystem from "./scripts/particles";
+// Objects
+import SceneObject from "./scripts/sceneObject";
 
 /*
  ***
@@ -45,14 +45,14 @@ overlayBtn.addEventListener("click", (e) => {
 window.addEventListener("load", (e) => {
   e.preventDefault;
   sound.add("bg", "sounds/bg.mp3");
-  sound.play("bg");
+  // sound.play("bg");
 });
 
-sound.add("bowls", "sounds/bowls.mp3");
+// sound.add("bowls", "sounds/bowls.mp3");
 sound.add("foodBox", "sounds/foodBox.mp3");
 sound.add("medicine", "sounds/medicine.mp3");
 sound.add("meow", "sounds/meow.mp3");
-sound.add("toys", "sounds/toys.mp3");
+// sound.add("toys", "sounds/toys.mp3");
 sound.add("treats", "sounds/treats.mp3");
 
 /*
@@ -63,41 +63,25 @@ sound.add("treats", "sounds/treats.mp3");
 
 const glowFilter = new GlowFilter({ distance: 15, outerStrength: 2 });
 
-
-let partContainer = new PIXI.Container();
-
-
-
+//Create Loader
+PIXI.Assets.add("bowls", "/assets/bowls.png");
+const bowlRef = await PIXI.Assets.load("bowls");
 // Bowls
-let bowlContainer = new PIXI.Container();
-app.stage.addChild(bowlContainer);
-let bowls = PIXI.Sprite.from("/assets/bowls.png");
-bowls.position.y = 330;
-bowls.position.x = 30;
-bowls.scale.x = 0.5;
-bowls.scale.y = 0.5;
-bowls.eventMode = "static";
-
-bowls.on("pointerdown", bowlClick);
-bowls.on("pointerover", bowlHoverOver);
-bowls.on("pointerover", bowlHoverOut);
-
-bowls.filters = [glowFilter];
-
-bowlContainer.addChild(bowls);
-function bowlClick() {
-  sound.play("bowls");
-  overlay.style.display = "flex";
-  overText.textContent = "Thanks for the Din-Din 🐟";
-}
-
-function bowlHoverOver() {
-  // bowlGlowFilter.alpha = 1;
-}
-
-function bowlHoverOut() {
-  // bowlGlowFilter.alpha = 0;
-}
+const bowls = new SceneObject(
+  app,
+  overlay,
+  overText,
+  true,
+  "bowls",
+  "bowls",
+  bowlRef,
+  30,
+  330,
+  0.5,
+  "static",
+  glowFilter,
+  "Thanks for the Din-Din 🐟"
+);
 
 // Food
 let foodContainer = new PIXI.Container();
@@ -156,25 +140,25 @@ treatsPos.forEach((sprite) => {
 });
 
 // Toys
-let toyContainer = new PIXI.Container();
-toyContainer.isSprite = true;
-app.stage.addChild(toyContainer);
-let toys = PIXI.Sprite.from("/assets/toys.png");
-toys.position.y = 245;
-toys.position.x = 220;
-toys.scale.x = 0.28;
-toys.scale.y = 0.28;
-toyContainer.addChild(toys);
-toys.filters = [glowFilter];
-toys.eventMode = "static";
-toys.on("pointerdown", toyClick);
 
-function toyClick() {
-  sound.play("toys");
-  console.log("hi");
-  overlay.style.display = "flex";
-  overText.textContent = "Mouse...mouse...mouse 🐭";
-}
+PIXI.Assets.add("toys", "/assets/toys.png");
+const toysRef = await PIXI.Assets.load("toys");
+// Bowls
+const toys = new SceneObject(
+  app,
+  overlay,
+  overText,
+  true,
+  "toys",
+  "toys",
+  toysRef,
+  220,
+  245,
+  0.28,
+  "static",
+  glowFilter,
+  "Mouse...mouse...mouse 🐭"
+);
 
 // Medicine
 let medsContainer = new PIXI.Container();
@@ -232,9 +216,73 @@ function catClick() {
   overText.textContent = "I 😻 U";
 }
 
-// Particle System
-// const myParticles = new ParticleSystem(app, "/assets/cat-profile.png")
-// myParticles.start();
+// Particles
+const cnt = new PIXI.ParticleContainer();
+app.stage.addChild(cnt);
+cnt.position.x = 150;
+cnt.position.y = 400;
+PIXI.Assets.add("heart", "/assets/heart.png");
+const heartRef = await PIXI.Assets.load("heart");
+
+
+const emitter = new particles.Emitter(cnt, {
+  lifetime: { min: 0.5, max: 3 },
+  frequency: 0.1,
+  spawnChance: 1,
+  particlesPerWave: 1,
+  emitterLifetime: 100,
+  maxParticles: 10,
+  pos: { x: 0, y: 0 },
+  autoUpdate: true,
+  behaviors: [
+    {
+      type: "spawnBurst",
+      config: {
+        start: 270,
+        spacing: 45,
+        distance: 0,
+      },
+    },
+    {
+      type: "spawnShape",
+      config: {
+        type: "rect",
+        data: { x: 0, y: 0, w: 40, h: 10 },
+      },
+    },
+    {
+      type: "textureSingle",
+      config: { texture: heartRef },
+    },
+    {
+      type: "moveSpeedStatic",
+      config: {
+        min: 50,
+        max: 500,
+      },
+    },
+    {
+      type: "rotationStatic",
+      config: {
+        min: 0,
+        max: 0,
+      },
+    },
+    {
+      type: "scale",
+      config: {
+        scale: {
+          list: [
+            { value: 0.1, time: 0 },
+            { value: 0.5, time: 0.5 },
+            { value: 0.1, time: 2 },
+          ],
+        },
+      },
+    },
+  ],
+});
+
 
 // Listen for frame updates
 app.ticker.add(() => {});
