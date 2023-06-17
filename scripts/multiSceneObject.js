@@ -1,7 +1,8 @@
 import * as PIXI from "pixi.js";
 import { sound } from "@pixi/sound";
+import { GlowFilter } from "@pixi/filter-glow";
 
-export default class SceneObject {
+export default class MultiSceneObject {
   constructor(
     app,
     overlay,
@@ -10,8 +11,7 @@ export default class SceneObject {
     soundName,
     spriteName,
     imgRef,
-    posX,
-    posY,
+    posArr,
     scaleSize,
     activeStat,
     addFilter,
@@ -27,23 +27,25 @@ export default class SceneObject {
     this.soundPath = `/sounds/${this.soundName}.mp3`;
     this.spriteName = spriteName;
     this.spriteUrl = `/assets/${this.spriteName}.png`;
-    this.sprite = PIXI.Sprite.from(imgRef);
-    if (this.sprite) {
-      this.sprite.position.x = posX;
-      this.sprite.position.y = posY;
-      this.sprite.scale.x = scaleSize;
-      this.sprite.scale.y = scaleSize;
-      this.sprite.eventMode = activeStat;
-      this.addFilter = addFilter; //name of filter applied
+    this.posArr = posArr;
 
-      // Check if there is a filter to add to object
-      if (this.addFilter) {
-        this.sprite.filters = [this.addFilter];
-      }
-      this.message = message;
-      this.sprite.on("pointerdown", this.onClick.bind(this));
-      container.addChild(this.sprite);
+    if (this.posArr) {
+      this.posArr.forEach((sprite) => {
+        const item = PIXI.Sprite.from(imgRef);
+        item.position.y = sprite[0];
+        item.position.x = sprite[1];
+        item.scale.x = scaleSize;
+        item.scale.y = scaleSize;
+        item.eventMode = activeStat
+        if (this.addFilter) {
+          item.filters = [addFilter];
+        }
+        item.on("pointerdown", this.onClick.bind(this));
+        container.addChild(item);
+      });
     }
+    this.message = message;
+
     sound.add(`${this.soundName}`, `${this.soundPath}`);
   }
 
@@ -55,3 +57,9 @@ export default class SceneObject {
     }
   }
 }
+
+// export class multiSceneObjects extends SceneObject{
+//  constructor(){
+//   super()
+//  }
+// }

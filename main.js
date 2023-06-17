@@ -1,15 +1,14 @@
 import "./style.css";
 import * as PIXI from "pixi.js";
-import * as particles from "@pixi/particle-emitter";
 import { sound } from "@pixi/sound";
 import { GlowFilter } from "@pixi/filter-glow";
 // Objects
 import SceneObject from "./scripts/sceneObject";
+import {createParticles} from "./scripts/particles";
+import MultiSceneObject  from "./scripts/multiSceneObject";
 
 /*
- ***
- ***** Scene Setup
- ***
+ ** Scene Setup
  */
 
 const size = {
@@ -45,22 +44,25 @@ overlayBtn.addEventListener("click", (e) => {
 window.addEventListener("load", (e) => {
   e.preventDefault;
   sound.add("bg", "sounds/bg.mp3");
-  // sound.play("bg");
+  sound.play("bg");
 });
 
-// sound.add("bowls", "sounds/bowls.mp3");
-sound.add("foodBox", "sounds/foodBox.mp3");
-sound.add("medicine", "sounds/medicine.mp3");
+
 sound.add("meow", "sounds/meow.mp3");
-// sound.add("toys", "sounds/toys.mp3");
-sound.add("treats", "sounds/treats.mp3");
 
 /*
- ***
- ***** Add Sprites/Containers
- ***
+ ** Add Sprites/Containers
  */
 
+ // Particles
+const cnt = new PIXI.ParticleContainer();
+app.stage.addChild(cnt);
+cnt.position.x = 150;
+cnt.position.y = 400;
+PIXI.Assets.add("heart", "/assets/heart.png");
+const heartRef = await PIXI.Assets.load("heart");
+
+// Filter
 const glowFilter = new GlowFilter({ distance: 15, outerStrength: 2 });
 
 //Create Loader
@@ -84,8 +86,6 @@ const bowls = new SceneObject(
 );
 
 // Food
-let foodContainer = new PIXI.Container();
-app.stage.addChild(foodContainer);
 const foodPos = [
   [180, 45],
   [180, 100],
@@ -95,49 +95,20 @@ const foodPos = [
   [295, 100],
 ];
 
-foodPos.forEach((sprite) => {
-  const food = PIXI.Sprite.from("/assets/food.png");
-  food.position.y = sprite[0];
-  food.position.x = sprite[1];
-  food.scale.x = 0.1;
-  food.scale.y = 0.1;
-  foodContainer.addChild(food);
-  // food.filters = [glowFilter];
-  // food.eventMode = "static";
-  // food.on("pointerdown", foodBoxClick);
-});
-function foodBoxClick() {
-  sound.play("foodBox");
-  console.log("hi");
-  overlay.style.display = "flex";
-  overText.textContent = "I 😻 U";
-}
+PIXI.Assets.add("foodBox", "/assets/foodBox.png");
+const foodBoxRef = await PIXI.Assets.load("foodBox");
+const foodBox = new MultiSceneObject(app, overlay, overText, true, "foodBox", "foodBox", foodBoxRef, foodPos,0.1, "static", glowFilter, "I 😻 U" )
 
 // Treats
-let treatsContainer = new PIXI.Container();
-app.stage.addChild(treatsContainer);
 const treatsPos = [
   [110, 25],
   [110, 65],
   [110, 110],
 ];
-treatsPos.forEach((sprite) => {
-  const treats = PIXI.Sprite.from("/assets/treats.png");
-  treats.position.y = sprite[0];
-  treats.position.x = sprite[1];
-  treats.scale.x = 0.13;
-  treats.scale.y = 0.13;
-  treatsContainer.addChild(treats);
-  treats.filters = [glowFilter];
-  treats.eventMode = "static";
-  treats.on("pointerdown", treatClick);
-  function treatClick() {
-    sound.play("treats");
-    console.log("hi");
-    overlay.style.display = "flex";
-    overText.textContent = "Yummmm...🍭";
-  }
-});
+PIXI.Assets.add("treats", "/assets/treats.png");
+const treatsRef = await PIXI.Assets.load("treats");
+const treats = new MultiSceneObject(app, overlay, overText, true, "treats", "treats", treatsRef, treatsPos, 0.13, "static", glowFilter, "Yummmm...🍭" )
+
 
 // Toys
 
@@ -161,29 +132,15 @@ const toys = new SceneObject(
 );
 
 // Medicine
-let medsContainer = new PIXI.Container();
-app.stage.addChild(medsContainer);
 const medsPos = [
   [120, 290],
   [120, 370],
 ];
-medsPos.forEach((sprite) => {
-  const meds = PIXI.Sprite.from("/assets/meds.png");
-  meds.position.y = sprite[0];
-  meds.position.x = sprite[1];
-  meds.scale.x = 0.13;
-  meds.scale.y = 0.13;
-  medsContainer.addChild(meds);
-  meds.filters = [glowFilter];
-  meds.eventMode = "static";
-  meds.on("pointerdown", medClick);
-  function medClick() {
-    sound.play("medicine");
-    console.log("hi");
-    overlay.style.display = "flex";
-    overText.textContent = "Feeling Much Better 💖";
-  }
-});
+
+PIXI.Assets.add("meds", "/assets/meds.png");
+const medsRef = await PIXI.Assets.load("meds");
+const meds = new MultiSceneObject(app, overlay, overText, true, "meds", "meds", medsRef, medsPos, 0.13, "static", glowFilter, "Feeling Much Better 💖" )
+
 
 // Animated Sprite
 const catImages = [
@@ -216,73 +173,24 @@ function catClick() {
   overText.textContent = "I 😻 U";
 }
 
-// Particles
-const cnt = new PIXI.ParticleContainer();
-app.stage.addChild(cnt);
-cnt.position.x = 150;
-cnt.position.y = 400;
-PIXI.Assets.add("heart", "/assets/heart.png");
-const heartRef = await PIXI.Assets.load("heart");
 
+const emitter = await createParticles(cnt)
+const displayPart =(delta)=>{
+  emitter.update(delta)
+}
 
-const emitter = new particles.Emitter(cnt, {
-  lifetime: { min: 0.5, max: 3 },
-  frequency: 0.1,
-  spawnChance: 1,
-  particlesPerWave: 1,
-  emitterLifetime: 100,
-  maxParticles: 10,
-  pos: { x: 0, y: 0 },
-  autoUpdate: true,
-  behaviors: [
-    {
-      type: "spawnBurst",
-      config: {
-        start: 270,
-        spacing: 45,
-        distance: 0,
-      },
-    },
-    {
-      type: "spawnShape",
-      config: {
-        type: "rect",
-        data: { x: 0, y: 0, w: 40, h: 10 },
-      },
-    },
-    {
-      type: "textureSingle",
-      config: { texture: heartRef },
-    },
-    {
-      type: "moveSpeedStatic",
-      config: {
-        min: 50,
-        max: 500,
-      },
-    },
-    {
-      type: "rotationStatic",
-      config: {
-        min: 0,
-        max: 0,
-      },
-    },
-    {
-      type: "scale",
-      config: {
-        scale: {
-          list: [
-            { value: 0.1, time: 0 },
-            { value: 0.5, time: 0.5 },
-            { value: 0.1, time: 2 },
-          ],
-        },
-      },
-    },
-  ],
+var elapsed = Date.now();
+var update = function(){
+	requestAnimationFrame(update);
+	var now = Date.now();
+  if(emitter){
+    displayPart((now - elapsed) * 0.001)
+  }
+	elapsed = now;
+};
+update()
+
+app.ticker.add(() => {
 });
 
-
-// Listen for frame updates
-app.ticker.add(() => {});
+export {cnt, app, heartRef}
