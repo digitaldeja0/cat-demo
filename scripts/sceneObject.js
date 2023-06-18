@@ -4,6 +4,7 @@ import { sound } from "@pixi/sound";
 export default class SceneObject {
   constructor(
     app,
+    moneyData,
     overlay,
     overText,
     addSound,
@@ -15,11 +16,14 @@ export default class SceneObject {
     scaleSize,
     activeStat,
     addFilter,
-    message
+    message,
+    price
   ) {
     this.app = app;
+    this. moneyData = moneyData
     this.container = new PIXI.Container();
     this.app.stage.addChild(this.container);
+    this.price = price
     this.overlay = overlay;
     this.overText = overText;
     this.addSound = addSound; //boolean to check if sound is going to be passed
@@ -50,6 +54,10 @@ export default class SceneObject {
   }
 
   onClick() {
+    // Update Price
+    const newTotal = this.moneyData.moneyTotal-this.price
+    this.moneyData.updateMoney(newTotal)
+    // Display and Sound
     if (this.addSound) {
       sound.play(this.soundName);
       this.overlay.style.display = "flex";

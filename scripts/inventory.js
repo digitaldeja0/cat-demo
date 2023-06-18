@@ -1,6 +1,6 @@
 export default class Inventory{
     constructor(bowls, foodBox, treats, toys, meds){
-         this.bowl = bowls, 
+         this.bowls = bowls, 
          this.foodBox = foodBox, 
          this.treats = treats, 
          this.toys = toys, 
