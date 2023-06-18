@@ -18,8 +18,8 @@ export default class SceneObject {
     message
   ) {
     this.app = app;
-    const container = new PIXI.Container();
-    this.app.stage.addChild(container);
+    this.container = new PIXI.Container();
+    this.app.stage.addChild(this.container);
     this.overlay = overlay;
     this.overText = overText;
     this.addSound = addSound; //boolean to check if sound is going to be passed
@@ -42,9 +42,11 @@ export default class SceneObject {
       }
       this.message = message;
       this.sprite.on("pointerdown", this.onClick.bind(this));
-      container.addChild(this.sprite);
+      this.container.addChild(this.sprite);
     }
     sound.add(`${this.soundName}`, `${this.soundPath}`);
+    this.container.name = `${this.spriteName}Cont`
+
   }
 
   onClick() {

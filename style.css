@@ -45,12 +45,20 @@ body {
   align-items: center;
 }
 
-#pText{
+.nameDiv{
   justify-self: flex-start;
   /* border: 3px solid red; */
   width: 55%;
-  padding:0 10px
+  display: flex;
+  flex-direction: column;
+}
 
+.nameDiv >*{
+  padding: 5px;
+}
+
+#moneyStat{
+  font-size: 1rem;
 }
 
 #statusContainer {
@@ -65,6 +73,13 @@ body {
   justify-content: flex-end;
   background-color: #28544B;
 }
+
+#shelterTitle{
+  color:white;
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
 
 .stats {
   display: flex;

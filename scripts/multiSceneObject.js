@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js";
 import { sound } from "@pixi/sound";
-import { GlowFilter } from "@pixi/filter-glow";
 
 export default class MultiSceneObject {
   constructor(
@@ -18,8 +17,8 @@ export default class MultiSceneObject {
     message
   ) {
     this.app = app;
-    const container = new PIXI.Container();
-    this.app.stage.addChild(container);
+    this.container = new PIXI.Container();
+    this.app.stage.addChild(this.container);
     this.overlay = overlay;
     this.overText = overText;
     this.addSound = addSound; //boolean to check if sound is going to be passed
@@ -28,6 +27,8 @@ export default class MultiSceneObject {
     this.spriteName = spriteName;
     this.spriteUrl = `/assets/${this.spriteName}.png`;
     this.posArr = posArr;
+    this.addFilter = addFilter
+    this.containrRef = []
 
     if (this.posArr) {
       this.posArr.forEach((sprite) => {
@@ -38,15 +39,16 @@ export default class MultiSceneObject {
         item.scale.y = scaleSize;
         item.eventMode = activeStat
         if (this.addFilter) {
-          item.filters = [addFilter];
+          item.filters = [this.addFilter];
         }
         item.on("pointerdown", this.onClick.bind(this));
-        container.addChild(item);
+        this.container.addChild(item);
       });
     }
     this.message = message;
 
     sound.add(`${this.soundName}`, `${this.soundPath}`);
+    this.container.name = `${this.spriteName}Cont`
   }
 
   onClick() {
@@ -58,8 +60,3 @@ export default class MultiSceneObject {
   }
 }
 
-// export class multiSceneObjects extends SceneObject{
-//  constructor(){
-//   super()
-//  }
-// }

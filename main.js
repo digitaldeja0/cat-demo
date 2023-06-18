@@ -4,8 +4,10 @@ import { sound } from "@pixi/sound";
 import { GlowFilter } from "@pixi/filter-glow";
 // Objects
 import SceneObject from "./scripts/sceneObject";
-import {createParticles} from "./scripts/particles";
-import MultiSceneObject  from "./scripts/multiSceneObject";
+import { createParticles } from "./scripts/particles";
+import MultiSceneObject from "./scripts/multiSceneObject";
+import Cat from "./scripts/cat";
+import Inventory from "./scripts/inventory";
 
 /*
  ** Scene Setup
@@ -24,8 +26,13 @@ const appDiv = document.querySelector("#app");
 appDiv.appendChild(app.view);
 
 // Load Text
-const pElement = document.querySelector("#pText");
-pElement.textContent = "Buffalo Cat Shelter";
+const shelterTitle = document.querySelector("#shelterTitle");
+shelterTitle.textContent = "Buffalo Cat Shelter";
+const moneyStat = document.querySelector("#moneyStat");
+moneyStat.textContent = "$100";
+const joyP = document.querySelector("#happyStat");
+const hungerP = document.querySelector("#nourishStat");
+const healthP = document.querySelector("#healthStat");
 
 //Setup Overlay
 
@@ -44,9 +51,8 @@ overlayBtn.addEventListener("click", (e) => {
 window.addEventListener("load", (e) => {
   e.preventDefault;
   sound.add("bg", "sounds/bg.mp3");
-  sound.play("bg");
+  // sound.play("bg");
 });
-
 
 sound.add("meow", "sounds/meow.mp3");
 
@@ -54,8 +60,9 @@ sound.add("meow", "sounds/meow.mp3");
  ** Add Sprites/Containers
  */
 
- // Particles
+// Particles
 const cnt = new PIXI.ParticleContainer();
+cnt.name = "particleCont";
 app.stage.addChild(cnt);
 cnt.position.x = 150;
 cnt.position.y = 400;
@@ -97,7 +104,20 @@ const foodPos = [
 
 PIXI.Assets.add("foodBox", "/assets/foodBox.png");
 const foodBoxRef = await PIXI.Assets.load("foodBox");
-const foodBox = new MultiSceneObject(app, overlay, overText, true, "foodBox", "foodBox", foodBoxRef, foodPos,0.1, "static", glowFilter, "I 😻 U" )
+const foodBox = new MultiSceneObject(
+  app,
+  overlay,
+  overText,
+  true,
+  "foodBox",
+  "foodBox",
+  foodBoxRef,
+  foodPos,
+  0.1,
+  "static",
+  glowFilter,
+  "I 😻 U"
+);
 
 // Treats
 const treatsPos = [
@@ -107,8 +127,20 @@ const treatsPos = [
 ];
 PIXI.Assets.add("treats", "/assets/treats.png");
 const treatsRef = await PIXI.Assets.load("treats");
-const treats = new MultiSceneObject(app, overlay, overText, true, "treats", "treats", treatsRef, treatsPos, 0.13, "static", glowFilter, "Yummmm...🍭" )
-
+const treats = new MultiSceneObject(
+  app,
+  overlay,
+  overText,
+  true,
+  "treats",
+  "treats",
+  treatsRef,
+  treatsPos,
+  0.13,
+  "static",
+  glowFilter,
+  "Yummmm...🍭"
+);
 
 // Toys
 
@@ -139,10 +171,24 @@ const medsPos = [
 
 PIXI.Assets.add("meds", "/assets/meds.png");
 const medsRef = await PIXI.Assets.load("meds");
-const meds = new MultiSceneObject(app, overlay, overText, true, "meds", "meds", medsRef, medsPos, 0.13, "static", glowFilter, "Feeling Much Better 💖" )
-
+const meds = new MultiSceneObject(
+  app,
+  overlay,
+  overText,
+  true,
+  "meds",
+  "meds",
+  medsRef,
+  medsPos,
+  0.13,
+  "static",
+  glowFilter,
+  "Feeling Much Better 💖"
+);
 
 // Animated Sprite
+const catContainer = new PIXI.ParticleContainer();
+catContainer.name = "catCont";
 const catImages = [
   "/assets/cat/1.png",
   "/assets/cat/2.png",
@@ -161,7 +207,9 @@ animatedSprite.scale.x = 0.1;
 animatedSprite.scale.y = 0.1;
 animatedSprite.play();
 animatedSprite.animationSpeed = 0.005;
-app.stage.addChild(animatedSprite);
+catContainer.addChild(animatedSprite);
+
+app.stage.addChild(catContainer);
 animatedSprite.filters = [glowFilter];
 
 animatedSprite.eventMode = "static";
@@ -173,24 +221,86 @@ function catClick() {
   overText.textContent = "I 😻 U";
 }
 
+// Create and Update Cat Object
+const cat1 = new Cat(joyP, hungerP, healthP);
+cat1.mangageJoy();
 
-const emitter = await createParticles(cnt)
-const displayPart =(delta)=>{
-  emitter.update(delta)
-}
+// Create Inventory
+const inventory = new Inventory(bowls, foodBox, treats, toys, meds);
 
-var elapsed = Date.now();
-var update = function(){
-	requestAnimationFrame(update);
-	var now = Date.now();
-  if(emitter){
-    displayPart((now - elapsed) * 0.001)
+// Loop through app children and grab isntances
+
+const appChildren = app.stage.children;
+const appChildrenRefOb = {};
+const inventoryRefObj = {};
+const inventoryNames = [
+  "bowlsCont",
+  "toysCont",
+  "FoodBoxCont",
+  "medsCont",
+  "treatsCont",
+];
+
+appChildren.forEach((e) => {
+  const name = e.name;
+  const childArr = e.children;
+  switch (name) {
+    case "bowlsCont":
+      inventory.bowls = childArr;
+      inventoryRefObj[name] = childArr;
+      break;
+    case "toysCont":
+      inventory.toys = childArr;
+      inventoryRefObj[name] = childArr;
+      break;
+    case "foodBoxCont":
+      inventory.foodBox = childArr;
+      inventoryRefObj[name] = childArr;
+      break;
+    case "medsCont":
+      inventory.meds = childArr;
+      inventoryRefObj[name] = childArr;
+      break;
+    case "treatsCont":
+      inventory.treats = childArr;
+      inventoryRefObj[name] = childArr;
+      break;
+
+    default:
+      break;
   }
-	elapsed = now;
-};
-update()
 
-app.ticker.add(() => {
+  appChildrenRefOb[name] = childArr;
 });
 
-export {cnt, app, heartRef}
+// console.log(appChildrenRefOb);
+// console.log(inventoryRefObj);
+
+console.log(inventory);
+
+
+
+// Emitter Object
+const emitter = await createParticles(cnt);
+const displayPart = (delta) => {
+  emitter.update(delta);
+};
+
+/*
+ ** Game Loop/Ticker
+ */
+
+var elapsed = Date.now();
+var update = function () {
+  requestAnimationFrame(update);
+  var now = Date.now();
+  if (emitter) {
+    displayPart((now - elapsed) * 0.001);
+  }
+  elapsed = now;
+};
+update();
+
+app.ticker.add(() => {});
+
+export { cnt, app, heartRef };
