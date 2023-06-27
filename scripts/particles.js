@@ -10,7 +10,7 @@ const cnt = await container
         frequency: 0.1,
         spawnChance: 1,
         particlesPerWave: 1,
-        emitterLifetime: 100,
+        // emitterLifetime: 100,
         maxParticles: 10,
         pos: { x: 0, y: 0 },
         autoUpdate: false,

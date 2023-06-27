@@ -9,64 +9,82 @@ export default class Cat {
     this.happy = "😊"
     this.neutral = "😨"
     this.angry = "😡"
-    console.log(this.joyP)
+    // console.log(this.joyP)
+  }
+  updateJoy(newJoy){
+    this.joy += newJoy
+    if(this.joy>=9){
+      this.joy = 9
+    }
+    console.log(this.joy)
+  }
+  updateHunger(newHunger){
+    this.hunger += newHunger
+    if(this.hunger>=9){
+      this.hunger = 9
+    }
+    console.log(this.hunger)
+  }
+  updateHealth(newHealth){
+    this.health += newHealth
+    if(this.health>=9){
+      this.health = 9
+    }
+    console.log(this.health)
   }
   mangageJoy() {
     let pTag = this.joyP
-    let stat = this.joy
     setInterval(() => {
-      if (stat >= 6 && stat <= 9 ) {
+      if (this.joy >= 6 && this.joy <= 9 ) {
         pTag.textContent = this.happy;
-        stat -= 1;
+        this.joy -= 1;
         // console.log(9)
-      } else if(stat >= 3 && stat <= 6){
+      } else if(this.joy >= 3 && this.joy <= 6){
         pTag.textContent = this.neutral;
-        stat -= 1;
+        this.joy -= 1;
         // console.log(6)
       }else {
-        stat = 0
+        this.joy = 0
         pTag.textContent = this.angry;
         // console.log(0)
       }
-    }, 1000); 
+    }, 3000); 
   }
   manageHunger(){
     let pTag = this.hungerP
-    let stat = this.hunger
     setInterval(() => {
-      if (stat >= 6 && stat <= 9 ) {
+      if (this.hunger >= 6 && this.hunger <= 9 ) {
         pTag.textContent = this.happy;
-        stat -= 1;
+        this.hunger -= 1;
         // console.log(9)
-      } else if(stat >= 3 && stat <= 6){
+      } else if(this.hunger >= 3 && this.hunger <= 6){
         pTag.textContent = this.neutral;
-        stat -= 1;
+        this.hunger -= 1;
         // console.log(6)
       }else {
-        stat = 0
+        this.hunger = 0
         pTag.textContent = this.angry;
         // console.log(0)
       }
-    }, 1000); 
+    }, 2000); 
   }
   manageHealth(){
     let pTag = this.healthP
-    let stat = this.health
     setInterval(() => {
-      if (stat >= 6 && stat <= 9 ) {
+      if (this.health >= 6 && this.health <= 9 ) {
         pTag.textContent = this.happy;
-        stat -= 1;
+        this.health -= 1;
         // console.log(9)
-      } else if(stat >= 3 && stat <= 6){
+      } else if(this.health >= 3 && this.health <= 6){
         pTag.textContent = this.neutral;
-        stat -= 1;
+        this.health -= 1;
         // console.log(6)
       }else {
-        stat = 0
+        this.health = 0
         pTag.textContent = this.angry;
         // console.log(0)
       }
-    }, 1000); 
+    }, 5500); 
   }
 
 }

@@ -17,7 +17,9 @@ export default class SceneObject {
     activeStat,
     addFilter,
     message,
-    price
+    price,
+    catObj, 
+    boostValue
   ) {
     this.app = app;
     this. moneyData = moneyData
@@ -32,6 +34,8 @@ export default class SceneObject {
     this.spriteName = spriteName;
     this.spriteUrl = `/assets/${this.spriteName}.png`;
     this.sprite = PIXI.Sprite.from(imgRef);
+    this.catObj= catObj
+    this.boostValue = boostValue
     if (this.sprite) {
       this.sprite.position.x = posX;
       this.sprite.position.y = posY;
@@ -54,6 +58,13 @@ export default class SceneObject {
   }
 
   onClick() {
+    // Update Cat 
+    if(this.spriteName === "toys"){
+      this.catObj.updateJoy(this.boostValue)
+    }
+    if(this.spriteName === "bowls"){
+      this.catObj.updateHunger(this.boostValue)
+    }
     // Update Price
     const newTotal = this.moneyData.moneyTotal-this.price
     this.moneyData.updateMoney(newTotal)

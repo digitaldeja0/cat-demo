@@ -35,7 +35,6 @@ const hungerP = document.querySelector("#nourishStat");
 const healthP = document.querySelector("#healthStat");
 
 //Setup Overlay
-
 const overlay = document.querySelector("#overDiv");
 overlay.style.display = "none";
 const overlayBtn = document.querySelector("#overButton");
@@ -73,10 +72,25 @@ class money{
       this.moneyStat.textContent = `$${this.moneyTotal}`
     }
   }
+  addRev(){
+    setInterval(() => {
+      this.moneyTotal +=10
+      this.moneyStat.textContent= `$${this.moneyTotal}`
+    }, 10000); 
+  }
 }
 
 const moneyData = new money(moneyStat)
 moneyStat.textContent = `$${moneyData.moneyTotal}`
+moneyData.addRev()
+
+
+
+// Create and Update Cat Object
+const cat1 = new Cat(joyP, hungerP, healthP);
+cat1.mangageJoy();
+cat1.manageHunger();
+cat1.manageHealth();
 
 /*
  ** Add Sprites/Containers
@@ -113,6 +127,8 @@ const bowls = new SceneObject(
   "static",
   glowFilter,
   "Thanks for the Din-Din 🐟",
+  2, 
+  cat1,
   2
 );
 
@@ -142,7 +158,9 @@ const foodBox = new MultiSceneObject(
   "static",
   glowFilter,
   "I 😻 U",
-  20
+  20,
+  cat1,
+  7
 );
 
 // Treats
@@ -167,7 +185,9 @@ const treats = new MultiSceneObject(
   "static",
   glowFilter,
   "Yummmm...🍭",
-  4
+  4,
+  cat1,
+  2
 );
 
 // Toys
@@ -189,7 +209,9 @@ const toys = new SceneObject(
   "static",
   glowFilter,
   "Mouse...mouse...mouse 🐭",
-  8
+  8,
+  cat1,
+  4
 );
 
 // Medicine
@@ -214,7 +236,9 @@ const meds = new MultiSceneObject(
   "static",
   glowFilter,
   "Feeling Much Better 💖",
-  24
+  24,
+  cat1,
+  8
 );
 
 // Animated Sprite
@@ -251,11 +275,7 @@ function catClick() {
 catContainer.addChild(animatedSprite);
 app.stage.addChild(catContainer);
 
-// Create and Update Cat Object
-const cat1 = new Cat(joyP, hungerP, healthP);
-cat1.mangageJoy();
-cat1.manageHunger();
-cat1.manageHealth();
+
 
 // Create Inventory
 const inventory = new Inventory(bowls, foodBox, treats, toys, meds);
@@ -313,7 +333,7 @@ const emitter = await createParticles(cnt);
 const displayPart = (delta) => {
   emitter.update(delta);
 };
-
+let  isEmitting = false
 /*
  ** Game Loop/Ticker
  */
@@ -322,6 +342,13 @@ var elapsed = Date.now();
 var update = function () {
   requestAnimationFrame(update);
   var now = Date.now();
+  if(cat1.joy>=6 && cat1.hunger>=6 && cat1.health >=6){
+    console.log("true")
+    emitter.emit = true;
+  }else{
+    isEmitting=false
+    emitter.emit = false
+  }
   if (emitter) {
     displayPart((now - elapsed) * 0.001);
   }

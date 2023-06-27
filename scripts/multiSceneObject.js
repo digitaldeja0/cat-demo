@@ -16,7 +16,9 @@ export default class MultiSceneObject {
     activeStat,
     addFilter,
     message,
-    price
+    price,
+    catObj,
+    boostValue
   ) {
     this.app = app;
     this.moneyData = moneyData
@@ -33,6 +35,10 @@ export default class MultiSceneObject {
     this.posArr = posArr;
     this.addFilter = addFilter
     this.containrRef = []
+    this.catObj= catObj
+    this.boostValue = boostValue
+
+
 
     if (this.posArr) {
       this.posArr.forEach((sprite) => {
@@ -56,6 +62,17 @@ export default class MultiSceneObject {
   }
 
   onClick() {
+        // Update Cat 
+        if(this.spriteName === "treats"){
+          this.catObj.updateJoy(this.boostValue)
+          this.catObj.updateHunger(1)
+        }
+        if(this.spriteName === "foodBox"){
+          this.catObj.updateHunger(this.boostValue)
+        }
+        if(this.spriteName === "meds"){
+          this.catObj.updateHealth(this.boostValue)
+        }
   
     // Update Price
     const newTotal = this.moneyData.moneyTotal-this.price
